@@ -1,0 +1,57 @@
+# PYTHON script
+import os
+import ansa 
+from ansa import utils, base, constants
+
+def main():
+	# Need some documentation? Run this with F5
+
+	#open xlsx_file
+	xl_element = utils.XlsxOpen('D:/book1.xlsx')
+	
+
+	#create new-empty xlsx_file
+	xl_element = utils.XlsxCreate()
+	
+	partList = base.CollectEntities(constants.NASTRAN,None, "__PROPERTIES__", filter_visible=True)
+	
+
+
+	#insert new empty sheet
+	utils.XlsxInsertSheet(xl_element)
+	
+	#To insert column heading	
+	utils.XlsxSetCellValue(xl_element, "Sheet1", 0 , 0,"PID")
+	utils.XlsxSetCellValue(xl_element, "Sheet1", 0 , 1,"Component Name")
+	utils.XlsxSetCellValue(xl_element, "Sheet1", 0 , 2,"MID1")
+	utils.XlsxSetCellValue(xl_element, "Sheet1", 0 , 3,"MID")
+	
+	for eachPart in range(0,len(partList)):
+		
+		#Collect the information of the parts		
+		partValue = base.GetEntityCardValues(constants.NASTRAN, partList[eachPart], ("Name", "__type__", "MID1", "MID2", "MID", "__id__"))
+		
+		#Checking the type of the part
+		if partValue["__type__"] == "PSHELL":
+			utils.XlsxSetCellValue(xl_element, "Sheet1", eachPart+1 , 2, str(partValue['MID1']))
+		else:
+			utils.XlsxSetCellValue(xl_element, "Sheet1", eachPart+1 , 3, str(partValue['MID']))
+		
+		#set value in cell
+		utils.XlsxSetCellValue(xl_element, "Sheet1", eachPart+1 , 0, str(partValue["__id__"]))
+		utils.XlsxSetCellValue(xl_element, "Sheet1", eachPart+1 , 1,  str(partValue["Name"]))
+		
+	
+	#save xlsx_file
+	utils.XlsxSave(xl_element, 'D:/book1.xlsx')
+
+
+	#Get the number of sheets
+	count = utils.XlsxSheetsCount(xl_element)
+
+	#close xlsx_file
+	utils.XlsxClose(xl_element)
+
+
+if __name__ == '__main__':
+	main()
